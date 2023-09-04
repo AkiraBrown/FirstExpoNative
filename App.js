@@ -10,10 +10,29 @@ const PlaceholderImage = require("./Images/background-image.png");
 // Component Imports
 import ImageViewer from "./components/imageViewer/ImageViewer";
 import Button from "./components/common/Button/Button";
+import CircleButton from "./components/circleButton/CircleButton";
+import IconButton from "./components/iconButton/IconButton";
+import EmojiPicker from "./components/emojiPicker/EmojiPicker";
+import EmojiList from "./components/emojiList/EmojiList";
+import EmojiSticker from "./components/emojiSticker/EmojiSticker";
 
 export default function App() {
   const [selectedImage, setSetselectedImage] = useState(null);
   const [showAppOptions, setshowAppOptions] = useState(false);
+  const [isModaleVisible, setIsModalVisible] = useState(false);
+  const [pickeEmoji, setPickeEmoji] = useState(null);
+
+  const onReset = () => {
+    setshowAppOptions(false);
+  };
+  const onAddSticker = () => {
+    setIsModalVisible(true);
+  };
+  const onSaveImageAsync = () => {};
+
+  const onModalClose = () => {
+    setIsModalVisible(false);
+  };
 
   //This function enables the user to pick an image from their local files
   const pickImageAsync = async () => {
@@ -37,9 +56,22 @@ export default function App() {
           placeHolderImageSource={PlaceholderImage}
           selectedImage={selectedImage}
         />
+        {pickeEmoji !== null ? (
+          <EmojiSticker imageSize={40} stickerSource={pickeEmoji} />
+        ) : null}
       </View>
       {showAppOptions ? (
-        <View />
+        <View style={styles.optionsContainer}>
+          <View style={styles.optionsRow}>
+            <IconButton icon={"refresh"} label={"Reset"} onPress={onReset} />
+            <CircleButton onPress={onAddSticker} />
+            <IconButton
+              icon={"save-alt"}
+              label={"Save"}
+              onPress={onSaveImageAsync}
+            />
+          </View>
+        </View>
       ) : (
         <View style={styles.footerContainer}>
           <Button
@@ -53,6 +85,9 @@ export default function App() {
           />
         </View>
       )}
+      <EmojiPicker isVisible={isModaleVisible} onClose={onModalClose}>
+        <EmojiList onSelect={setPickeEmoji} onCloseModal={onModalClose} />
+      </EmojiPicker>
       <StatusBar style="auto" />
     </View>
   );
@@ -72,5 +107,13 @@ const styles = StyleSheet.create({
   footerContainer: {
     flex: 1 / 3,
     alignItems: "center",
+  },
+  optionsContainer: {
+    position: "absolute",
+    bottom: 80,
+  },
+  optionsRow: {
+    alignItems: "center",
+    flexDirection: "row",
   },
 });
