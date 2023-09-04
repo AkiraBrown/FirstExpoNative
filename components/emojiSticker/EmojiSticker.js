@@ -1,9 +1,8 @@
 import { View, Image } from "react-native";
 import {
-  TapGestureHandler,
   PanGestureHandler,
+  TapGestureHandler,
 } from "react-native-gesture-handler";
-
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -15,12 +14,17 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 export default function EmojiSticker({ imageSize, stickerSource }) {
-  const scaleImage = useSharedValue(imageSize);
-
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+  const scaleImage = useSharedValue(imageSize);
 
-  //EventHandler Functions
+  const imageStyle = useAnimatedStyle(() => {
+    return {
+      width: withSpring(scaleImage.value),
+      height: withSpring(scaleImage.value),
+    };
+  });
+
   const onDoubleTap = useAnimatedGestureHandler({
     onActive: () => {
       if (scaleImage.value !== imageSize * 2) {
@@ -29,6 +33,9 @@ export default function EmojiSticker({ imageSize, stickerSource }) {
     },
   });
 
+  /* There's an issue with the on drag where the translate values are returning NaN
+    So look for a hotfix soon
+  */
   const onDrag = useAnimatedGestureHandler({
     onStart: (event, context) => {
       context.translateX = translateX.value;
@@ -41,7 +48,7 @@ export default function EmojiSticker({ imageSize, stickerSource }) {
   });
 
   const containerStyle = useAnimatedStyle(() => {
-    return {
+    let testCoord = {
       transform: [
         {
           translateX: translateX.value,
@@ -51,12 +58,17 @@ export default function EmojiSticker({ imageSize, stickerSource }) {
         },
       ],
     };
-  });
+    console.log(testCoord);
 
-  const imageStyle = useAnimatedStyle(() => {
     return {
-      width: withSpring(scaleImage.value),
-      height: withSpring(scaleImage.value),
+      transform: [
+        {
+          translateX: translateX.value,
+        },
+        {
+          translateY: translateY.value,
+        },
+      ],
     };
   });
 
